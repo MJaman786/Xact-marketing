@@ -17,6 +17,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import useLogout from "../../hooks/Auth/useLogout";
 import { useAuthStore } from "../../store/Auth/useAuthStore";
+import type { UserRole } from "../../types/Auth";
 // IMPORT YOUR HOOK HERE (Adjust the path below to match your project structure)
 // import { useLogout } from "../hooks/useLogout"; 
 
@@ -40,7 +41,28 @@ interface SidebarProps {
     onClose: () => void;
 }
 
-const menuItems: MenuItem[] = [
+const superAdminItem: MenuItem[] = [
+    { label: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/super-admin/dashboard" },
+    { label: "Insights", icon: <BarChart3 size={18} />, path: "/super-admin/insights" },
+    { label: "Updates", icon: <TrendingUp size={18} />, path: "/super-admin/updates" },
+    { label: "Message", icon: <MessageSquare size={18} />, path: "/super-admin/messages", badge: 20 },
+    {
+        label: "Customers",
+        icon: <Users size={18} />,
+        children: [
+            { label: "Overview", path: "/super-admin/customers/overview" },
+            { label: "Segments", path: "/super-admin/customers/segments" },
+        ]
+    },
+    { label: "Recurring", icon: <RefreshCw size={18} />, path: "/super-admin/recurring" },
+    { label: "Subscriptions", icon: <CreditCard size={18} />, path: "/super-admin/subscriptions" },
+    { label: "Feedback", icon: <MessageCircle size={18} />, path: "/super-admin/feedback" },
+    { label: "Settings", icon: <Settings size={18} />, path: "/super-admin/settings" },
+    { label: "Help Desk", icon: <HelpCircle size={18} />, path: "/super-admin/help" },
+    { label: "Logout", icon: <LogOut size={18} />, path: "/logout", logout: true },
+];
+
+const adminItem: MenuItem[] = [
     { label: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/admin/dashboard" },
     { label: "Insights", icon: <BarChart3 size={18} />, path: "/admin/insights" },
     { label: "Updates", icon: <TrendingUp size={18} />, path: "/admin/updates" },
@@ -61,9 +83,45 @@ const menuItems: MenuItem[] = [
     { label: "Logout", icon: <LogOut size={18} />, path: "/logout", logout: true },
 ];
 
+const userItem: MenuItem[] = [
+    { label: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/user/dashboard" },
+    { label: "Insights", icon: <BarChart3 size={18} />, path: "/user/insights" },
+    { label: "Updates", icon: <TrendingUp size={18} />, path: "/user/updates" },
+    { label: "Message", icon: <MessageSquare size={18} />, path: "/user/messages", badge: 20 },
+    {
+        label: "Customers",
+        icon: <Users size={18} />,
+        children: [
+            { label: "Overview", path: "/user/customers" },
+            { label: "Segments", path: "/user/customers/segments" },
+        ]
+    },
+    { label: "Recurring", icon: <RefreshCw size={18} />, path: "/user/recurring" },
+    { label: "Subscriptions", icon: <CreditCard size={18} />, path: "/user/subscriptions" },
+    { label: "Feedback", icon: <MessageCircle size={18} />, path: "/user/feedback" },
+    { label: "Settings", icon: <Settings size={18} />, path: "/user/settings" },
+    { label: "Help Desk", icon: <HelpCircle size={18} />, path: "/user/help" },
+    { label: "Logout", icon: <LogOut size={18} />, path: "/logout", logout: true },
+];
+
+const getMenuItem = (role: UserRole) => {
+    switch (role) {
+        case 'SUPER_ADMIN':
+            return superAdminItem;
+        case 'ADMIN':
+            return adminItem;
+        case 'USER':
+            return userItem;
+        default:
+            return [];
+    }
+}
+
 export default function Sidebar({ activePage, isOpen, onClose }: SidebarProps) {
     const navigate = useNavigate();
     const { logout } = useAuthStore();
+    const { user } = useAuthStore();
+    const menuItems = getMenuItem(user?.role!);
 
     // CALL YOUR HOOK HERE
     // (Assuming your hook returns a function named 'logout' or adjust it to whatever your hook exposes)

@@ -1,22 +1,32 @@
 import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { User, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { User, Mail, Lock, Eye, EyeOff, ArrowRight, Phone } from "lucide-react";
+import useSignUp from "../../hooks/Auth/useSignup";
+import { useNavigate } from "react-router-dom";
 
 // --- Validation Schema ---
 const SignupSchema = Yup.object().shape({
   name: Yup.string()
     .min(2, "Name is too short")
     .required("Full name is required"),
+
   email: Yup.string()
     .email("Invalid email address")
     .required("Email is required"),
+
+  phone: Yup.string()
+    .matches(/^[6-9]\d{9}$/, "Enter a valid 10-digit phone number")
+    .required("Phone number is required"),
+
   password: Yup.string()
     .min(6, "Password must be at least 6 characters")
     .required("Password is required"),
+
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password")], "Passwords must match")
     .required("Please confirm your password"),
+
   agreeTerms: Yup.boolean()
     .oneOf([true], "You must accept the terms and conditions")
     .required(),
@@ -25,26 +35,46 @@ const SignupSchema = Yup.object().shape({
 export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const navigate = useNavigate();
+  // 🔥 hook signup
+  const { mutate: signupUser, isPending: isEecuting } = useSignUp();
 
   const formik = useFormik({
     initialValues: {
       name: "",
       email: "",
+      phone: "",
       password: "",
       confirmPassword: "",
       agreeTerms: false,
     },
     validationSchema: SignupSchema,
-    onSubmit: (values) => {
-      console.log("Signup Submitting:", values);
-      // Integrate your registration mutation/API call here
+    onSubmit: (data, action) => {
+      const payload = {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        confirmPassword: data.confirmPassword,
+        phone: data.phone
+      }
+      signupUser({ payload: payload }, {
+        onSuccess: (response) => {
+          if (response?.success !== false) {
+            action.resetForm();
+            navigate(`/verify-otp/${response?.data.user._id}/EMAIL_VERIFICATION`)
+          }
+          else {
+            return
+          }
+        }
+      });
     },
   });
 
   return (
     <div className="p-4 md:p-3 min-h-screen bg-slate-50 flex items-center justify-center font-sans">
       <div className="w-full min-h-screen lg:min-h-[850px] lg:h-[90vh] max-w-[1440px] bg-white lg:rounded-3xl lg:shadow-xl lg:shadow-slate-200/50 lg:border lg:border-slate-100 overflow-hidden flex">
-        
+
         {/* --- LEFT SIDE: BRAND / ARTWORK PANEL (Hidden on Mobile) --- */}
         <div className="hidden lg:flex lg:w-1/2 bg-slate-900 relative flex-col justify-between p-12 overflow-hidden">
           {/* Decorative Background Accents */}
@@ -86,7 +116,7 @@ export default function Signup() {
 
         {/* --- RIGHT SIDE: FORM PANEL --- */}
         <div className="w-full lg:w-1/2 flex flex-col justify-center px-6 sm:px-16 lg:px-20 xl:px-24 py-12 relative bg-white overflow-y-auto no-scrollbar">
-          
+
           {/* Mobile Logo Visibility */}
           <div className="flex items-center gap-3 lg:hidden mb-10 absolute top-8 left-6 sm:left-16">
             <div className="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-between p-2 text-white">
@@ -109,7 +139,7 @@ export default function Signup() {
 
           {/* Formik Form Container */}
           <form onSubmit={formik.handleSubmit} className="space-y-4">
-            
+
             {/* Full Name Field */}
             <div className="space-y-1.5">
               <label htmlFor="name" className="text-xs font-semibold text-slate-600 tracking-wide">
@@ -127,11 +157,10 @@ export default function Signup() {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   value={formik.values.name}
-                  className={`w-full pl-11 pr-4 py-2.5 bg-white border rounded-xl text-sm transition-all duration-200 outline-none focus:ring-2 focus:ring-indigo-50/80 ${
-                    formik.touched.name && formik.errors.name
-                      ? "border-red-300 focus:border-red-500 focus:ring-red-50"
-                      : "border-slate-200 focus:border-indigo-600 focus:shadow-sm"
-                  }`}
+                  className={`w-full pl-11 pr-4 py-2.5 bg-white border rounded-xl text-sm transition-all duration-200 outline-none focus:ring-2 focus:ring-indigo-50/80 ${formik.touched.name && formik.errors.name
+                    ? "border-red-300 focus:border-red-500 focus:ring-red-50"
+                    : "border-slate-200 focus:border-indigo-600 focus:shadow-sm"
+                    }`}
                 />
               </div>
               {formik.touched.name && formik.errors.name && (
@@ -158,16 +187,48 @@ export default function Signup() {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   value={formik.values.email}
-                  className={`w-full pl-11 pr-4 py-2.5 bg-white border rounded-xl text-sm transition-all duration-200 outline-none focus:ring-2 focus:ring-indigo-50/80 ${
-                    formik.touched.email && formik.errors.email
-                      ? "border-red-300 focus:border-red-500 focus:ring-red-50"
-                      : "border-slate-200 focus:border-indigo-600 focus:shadow-sm"
-                  }`}
+                  className={`w-full pl-11 pr-4 py-2.5 bg-white border rounded-xl text-sm transition-all duration-200 outline-none focus:ring-2 focus:ring-indigo-50/80 ${formik.touched.email && formik.errors.email
+                    ? "border-red-300 focus:border-red-500 focus:ring-red-50"
+                    : "border-slate-200 focus:border-indigo-600 focus:shadow-sm"
+                    }`}
                 />
               </div>
               {formik.touched.email && formik.errors.email && (
                 <p className="text-xs font-medium text-red-500 mt-1 pl-1">
                   {formik.errors.email}
+                </p>
+              )}
+            </div>
+
+            {/* Phone Number Field */}
+            <div className="space-y-1.5">
+              <label
+                htmlFor="phone"
+                className="text-xs font-semibold text-slate-600 tracking-wide"
+              >
+                Phone Number
+              </label>
+              <div className="relative group">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 group-focus-within:text-indigo-600 transition-colors">
+                  <Phone size={18} strokeWidth={1.5} />
+                </span>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  placeholder="9876543210"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.phone}
+                  className={`w-full pl-11 pr-4 py-2.5 bg-white border rounded-xl text-sm transition-all duration-200 outline-none focus:ring-2 focus:ring-indigo-50/80 ${formik.touched.phone && formik.errors.phone
+                    ? "border-red-300 focus:border-red-500 focus:ring-red-50"
+                    : "border-slate-200 focus:border-indigo-600 focus:shadow-sm"
+                    }`}
+                />
+              </div>
+              {formik.touched.phone && formik.errors.phone && (
+                <p className="text-xs font-medium text-red-500 mt-1 pl-1">
+                  {formik.errors.phone}
                 </p>
               )}
             </div>
@@ -189,11 +250,10 @@ export default function Signup() {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   value={formik.values.password}
-                  className={`w-full pl-11 pr-11 py-2.5 bg-white border rounded-xl text-sm transition-all duration-200 outline-none focus:ring-2 focus:ring-indigo-50/80 ${
-                    formik.touched.password && formik.errors.password
-                      ? "border-red-300 focus:border-red-500 focus:ring-red-50"
-                      : "border-slate-200 focus:border-indigo-600 focus:shadow-sm"
-                  }`}
+                  className={`w-full pl-11 pr-11 py-2.5 bg-white border rounded-xl text-sm transition-all duration-200 outline-none focus:ring-2 focus:ring-indigo-50/80 ${formik.touched.password && formik.errors.password
+                    ? "border-red-300 focus:border-red-500 focus:ring-red-50"
+                    : "border-slate-200 focus:border-indigo-600 focus:shadow-sm"
+                    }`}
                 />
                 <button
                   type="button"
@@ -227,11 +287,10 @@ export default function Signup() {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   value={formik.values.confirmPassword}
-                  className={`w-full pl-11 pr-11 py-2.5 bg-white border rounded-xl text-sm transition-all duration-200 outline-none focus:ring-2 focus:ring-indigo-50/80 ${
-                    formik.touched.confirmPassword && formik.errors.confirmPassword
-                      ? "border-red-300 focus:border-red-500 focus:ring-red-50"
-                      : "border-slate-200 focus:border-indigo-600 focus:shadow-sm"
-                  }`}
+                  className={`w-full pl-11 pr-11 py-2.5 bg-white border rounded-xl text-sm transition-all duration-200 outline-none focus:ring-2 focus:ring-indigo-50/80 ${formik.touched.confirmPassword && formik.errors.confirmPassword
+                    ? "border-red-300 focus:border-red-500 focus:ring-red-50"
+                    : "border-slate-200 focus:border-indigo-600 focus:shadow-sm"
+                    }`}
                 />
                 <button
                   type="button"
@@ -280,7 +339,7 @@ export default function Signup() {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={formik.isSubmitting}
+              disabled={isEecuting}
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-3 px-4 rounded-xl transition-all duration-200 shadow-sm shadow-indigo-200/80 flex items-center justify-center gap-2 mt-4 disabled:opacity-70 disabled:cursor-not-allowed group"
             >
               <span>{formik.isSubmitting ? "Creating account..." : "Get Started Now"}</span>

@@ -45,7 +45,7 @@ const register = asyncHandler(async (req, res) => {
     sendSuccess(res, {
         statusCode: 201,
         message: 'OTP sent successfully. Please verify your email.',
-        data: user,
+        data: { user: user },
     });
 });
 
@@ -175,8 +175,9 @@ const verifyOtp = asyncHandler(async (req, res) => {
             message: 'OTP verified successfully',
             data: {
                 verified: true,
-                type,
-                accessToken,
+                type: type,
+                accessToken: accessToken,
+                user: user
             },
         });
     }
