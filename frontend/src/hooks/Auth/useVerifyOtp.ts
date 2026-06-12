@@ -1,14 +1,12 @@
 import { useMutation } from "@tanstack/react-query"
-import { SIGNUP } from "../../constants/urls"
+import { VERIFY_OTP } from "../../constants/urls"
 import makeRequest from "../../utils/helpers/MakeRequest"
 import type { User } from "../../types/Auth"
 
 type payload = {
-    name: string,
-    email: string,
-    password: string,
-    confirmPassword: string,
-    phone: string
+    userId: string,
+    type: string,
+    otp: string
 }
 
 interface Prop {
@@ -16,22 +14,25 @@ interface Prop {
 }
 
 interface ApiResponse {
-    user: User
+    verified: boolean,
+    type: string,
+    accessToken: string,
+    user:User
 }
 
-const signup = async ({ payload }: Prop) => {
+const verifyOtp = async ({ payload }: Prop) => {
     const res = await makeRequest<ApiResponse>({
+        pathname: VERIFY_OTP,
         method: 'POST',
-        pathname: SIGNUP,
+        showMessage: true,
         token: false,
-        values: { ...payload },
-        showMessage: true
+        values: { ...payload }
     })
     return res;
 }
 
-export default function useSignUp() {
+export default function useVerifyOtp() {
     return useMutation({
-        mutationFn: signup
+        mutationFn: verifyOtp
     })
 }
