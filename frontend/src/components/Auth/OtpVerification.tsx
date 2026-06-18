@@ -13,6 +13,15 @@ export const OtpVerification: React.FC = () => {
     const navigate = useNavigate();
     const { userId, type } = useParams();
 
+    const userNavigate = (role: string) => {
+        switch (role) {
+            case 'SUPER_ADMIN': return navigate(`/super-admin/dashboard`);
+            case 'ADMIN': return navigate(`/admin/dashboard`);
+            case 'USER': return navigate(`/user/dashboard`);
+            default: return navigate(`/unauthorized`);
+        }
+    }
+
     // 🔥 Hook send otp
     const { mutate: sendOtp, isPending: isSending } = useSendOtp();
 
@@ -124,7 +133,7 @@ export const OtpVerification: React.FC = () => {
                         if (response?.success !== false) {
                             // 2. TODO: save to store
                             login(response?.data.user!, response?.data.accessToken!);
-                            navigate('/admin/dashboard');
+                            userNavigate(response?.data.user.role!);
                         }
                         else {
                             return

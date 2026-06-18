@@ -16,10 +16,21 @@ const LoginSchema = Yup.object().shape({
     .required("Password is required"),
 });
 
+
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuthStore();
   const navigate = useNavigate();
+
+  const userNavigate = (role: string) => {
+    switch (role) {
+      case 'SUPER_ADMIN': return navigate(`/super-admin/dashboard`);
+      case 'ADMIN': return navigate(`/admin/dashboard`);
+      case 'USER': return navigate(`/user/dashboard`);
+      default: return navigate(`/unauthorized`);
+    }
+  }
+
   const { mutate: userLogin, isPending: isLoggingUser } = useLogin();
   const formik = useFormik({
     initialValues: {
@@ -34,7 +45,7 @@ export default function Login() {
           if (response?.success && response.data?.user && response.data?.accessToken) {
             action.resetForm();
             login(response.data.user, response.data.accessToken);
-            navigate('/admin/dashboard');
+            userNavigate(response.data.user.role);
           } else {
             return
           }
