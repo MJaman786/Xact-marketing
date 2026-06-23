@@ -5,11 +5,12 @@ import envConfig from '../config/env.config.js';
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        type: 'OAuth2',
         user: envConfig.GOOGLE_USER_EMAIL,
-        clientId: envConfig.GOOGLE_CLIENT_ID,
-        clientSecret: envConfig.GOOGLE_CLIENT_SECRET,
-        refreshToken: envConfig.GOOGLE_REFRESH_TOKEN,
+        pass: envConfig.GOOGLE_APP_PASSWORD
+        // type: 'OAuth2',
+        // clientId: envConfig.GOOGLE_CLIENT_ID,
+        // clientSecret: envConfig.GOOGLE_CLIENT_SECRET,
+        // refreshToken: envConfig.GOOGLE_REFRESH_TOKEN,
     },
 });
 
