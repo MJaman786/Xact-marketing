@@ -36,17 +36,6 @@ const transporter = nodemailer.createTransport({
   debug: true,
 });
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  requireTLS: true,
-  auth: {
-    user: envConfig.GOOGLE_USER_EMAIL,
-    pass: envConfig.GOOGLE_APP_PASSWORD,
-  },
-});
-
 // ✅ Verify transporter connection
 transporter.verify((error, success) => {
     if (error) {
