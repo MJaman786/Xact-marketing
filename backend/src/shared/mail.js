@@ -17,18 +17,29 @@ console.log("PASSWORD EXISTS:", !!envConfig.GOOGLE_APP_PASSWORD);
 //     },
 // });
 
+// const transporter = nodemailer.createTransport({
+//     host: "smtp.gmail.com",
+//     port: 587,
+//     secure: false,
+//     requireTLS: true,
+//     auth: {
+//         user: envConfig.GOOGLE_USER_EMAIL,
+//         pass: envConfig.GOOGLE_APP_PASSWORD,
+//     },
+//     connectionTimeout: 30000,
+//     greetingTimeout: 30000,
+//     socketTimeout: 30000,
+// });
+
 const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    requireTLS: true,
-    auth: {
-        user: envConfig.GOOGLE_USER_EMAIL,
-        pass: envConfig.GOOGLE_APP_PASSWORD,
-    },
-    connectionTimeout: 30000,
-    greetingTimeout: 30000,
-    socketTimeout: 30000,
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  requireTLS: true,
+  auth: {
+    user: envConfig.GOOGLE_USER_EMAIL,
+    pass: envConfig.GOOGLE_APP_PASSWORD,
+  },
 });
 
 // ✅ Verify transporter connection
