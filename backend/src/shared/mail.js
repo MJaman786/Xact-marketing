@@ -1,17 +1,34 @@
 import nodemailer from 'nodemailer';
 import envConfig from '../config/env.config.js';
 
+console.log("EMAIL:", envConfig.GOOGLE_USER_EMAIL);
+console.log("PASSWORD EXISTS:", !!envConfig.GOOGLE_APP_PASSWORD);
+
 // ✅ Configure transporter
+// const transporter = nodemailer.createTransport({
+//     service: 'gmail',
+//     auth: {
+//         user: envConfig.GOOGLE_USER_EMAIL,
+//         pass: envConfig.GOOGLE_APP_PASSWORD
+//         // type: 'OAuth2',
+//         // clientId: envConfig.GOOGLE_CLIENT_ID,
+//         // clientSecret: envConfig.GOOGLE_CLIENT_SECRET,
+//         // refreshToken: envConfig.GOOGLE_REFRESH_TOKEN,
+//     },
+// });
+
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    requireTLS: true,
     auth: {
         user: envConfig.GOOGLE_USER_EMAIL,
-        pass: envConfig.GOOGLE_APP_PASSWORD
-        // type: 'OAuth2',
-        // clientId: envConfig.GOOGLE_CLIENT_ID,
-        // clientSecret: envConfig.GOOGLE_CLIENT_SECRET,
-        // refreshToken: envConfig.GOOGLE_REFRESH_TOKEN,
+        pass: envConfig.GOOGLE_APP_PASSWORD,
     },
+    connectionTimeout: 30000,
+    greetingTimeout: 30000,
+    socketTimeout: 30000,
 });
 
 // ✅ Verify transporter connection
